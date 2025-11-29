@@ -1,15 +1,18 @@
+
 import React from 'react';
 import { MaterialEstimate } from '../types';
 import { Ruler, Scissors, Box, Layers, Coins, ArrowUpToLine, GitCommitHorizontal, MoveHorizontal } from 'lucide-react';
+import { Texts } from '../translations';
 
 interface ResultsTableProps {
   data: MaterialEstimate[];
   mainPrice?: string;
   liningPrice?: string;
   insulationPrice?: string;
+  texts: Texts;
 }
 
-const ResultsTable: React.FC<ResultsTableProps> = ({ data, mainPrice, liningPrice, insulationPrice }) => {
+const ResultsTable: React.FC<ResultsTableProps> = ({ data, mainPrice, liningPrice, insulationPrice, texts }) => {
   if (!data || data.length === 0) return null;
 
   // Helper to parse quantity string (e.g. "1.5 м" -> 1.5)
@@ -34,10 +37,10 @@ const ResultsTable: React.FC<ResultsTableProps> = ({ data, mainPrice, liningPric
         <div className="p-6 bg-slate-50 border-b border-slate-200">
           <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
             <Scissors className="text-indigo-600" />
-            Розрахунок витрат та параметри виробу
+            {texts.resultsTitle}
           </h2>
           <p className="text-sm text-slate-500 mt-1">
-            Орієнтовні норми витрат та виміри на основі аналізу зображення
+            {texts.resultsSubtitle}
           </p>
         </div>
         
@@ -45,53 +48,53 @@ const ResultsTable: React.FC<ResultsTableProps> = ({ data, mainPrice, liningPric
           <table className="w-full text-left border-collapse min-w-[1000px]">
             <thead>
               <tr className="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider">
-                <th className="p-4 font-bold border-b border-slate-200 w-16 sticky left-0 bg-slate-100 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Розмір</th>
+                <th className="p-4 font-bold border-b border-slate-200 w-16 sticky left-0 bg-slate-100 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">{texts.size}</th>
                 
                 {/* Product Dimensions Group */}
                 <th className="p-4 font-semibold border-b border-slate-200 border-l border-slate-200 w-24 bg-indigo-50/30 text-indigo-900">
                   <div className="flex flex-col gap-1">
-                    <span className="flex items-center gap-1"><ArrowUpToLine size={14}/> Довжина</span>
-                    <span className="text-[10px] text-slate-400 normal-case">по спинці</span>
+                    <span className="flex items-center gap-1"><ArrowUpToLine size={14}/> {texts.length}</span>
+                    <span className="text-[10px] text-slate-400 normal-case">{texts.back}</span>
                   </div>
                 </th>
                 <th className="p-4 font-semibold border-b border-slate-200 w-24 bg-indigo-50/30 text-indigo-900">
                    <div className="flex flex-col gap-1">
-                    <span className="flex items-center gap-1"><MoveHorizontal size={14}/> Груди</span>
-                    <span className="text-[10px] text-slate-400 normal-case">напівобхват</span>
+                    <span className="flex items-center gap-1"><MoveHorizontal size={14}/> {texts.chest}</span>
+                    <span className="text-[10px] text-slate-400 normal-case">{texts.halfGirth}</span>
                   </div>
                 </th>
                  <th className="p-4 font-semibold border-b border-slate-200 border-r border-slate-200 w-24 bg-indigo-50/30 text-indigo-900">
                    <div className="flex flex-col gap-1">
-                    <span className="flex items-center gap-1"><GitCommitHorizontal size={14}/> Рукав</span>
-                    <span className="text-[10px] text-slate-400 normal-case">від плеча</span>
+                    <span className="flex items-center gap-1"><GitCommitHorizontal size={14}/> {texts.sleeve}</span>
+                    <span className="text-[10px] text-slate-400 normal-case">{texts.fromShoulder}</span>
                   </div>
                 </th>
 
                 {/* Materials Group */}
                 <th className="p-4 font-semibold border-b border-slate-200 w-32">
                   <div className="flex items-center gap-2">
-                    <Layers size={16} /> Основна
+                    <Layers size={16} /> {texts.main}
                   </div>
                 </th>
                 <th className="p-4 font-semibold border-b border-slate-200 w-32">
                    <div className="flex items-center gap-2">
-                    <Layers size={16} /> Підкладка
+                    <Layers size={16} /> {texts.liningFabric}
                   </div>
                 </th>
                 <th className="p-4 font-semibold border-b border-slate-200 w-32">
                    <div className="flex items-center gap-2">
-                    <Box size={16} /> Утеплювач
+                    <Box size={16} /> {texts.insulation}
                   </div>
                 </th>
                 <th className="p-4 font-semibold border-b border-slate-200">
                    <div className="flex items-center gap-2">
-                    <Ruler size={16} /> Фурнітура
+                    <Ruler size={16} /> {texts.hardware}
                   </div>
                 </th>
                 {showCost && (
                   <th className="p-4 font-semibold border-b border-slate-200 w-36 bg-emerald-50 text-emerald-700">
                     <div className="flex items-center gap-2">
-                      <Coins size={16} /> Вартість*
+                      <Coins size={16} /> {texts.cost}
                     </div>
                   </th>
                 )}
@@ -159,7 +162,7 @@ const ResultsTable: React.FC<ResultsTableProps> = ({ data, mainPrice, liningPric
                     {showCost && (
                       <td className="p-4 text-emerald-800 font-bold bg-emerald-50/30">
                         {totalCost > 0 ? totalCost.toFixed(2) : '-'}
-                        <span className="text-xs font-normal text-emerald-600 ml-1">у.о.</span>
+                        <span className="text-xs font-normal text-emerald-600 ml-1">{texts.currency}</span>
                       </td>
                     )}
                   </tr>
@@ -170,12 +173,12 @@ const ResultsTable: React.FC<ResultsTableProps> = ({ data, mainPrice, liningPric
         </div>
         {showCost ? (
            <div className="p-4 bg-emerald-50/50 text-xs text-slate-500 border-t border-slate-200">
-            <p className="font-semibold text-emerald-700 mb-1">Формула розрахунку вартості:</p>
-            (Основна + Підкладка + Утеплювач) + 15% від (Основна + Підкладка) на фурнітуру
+            <p className="font-semibold text-emerald-700 mb-1">{texts.formulaTitle}</p>
+            {texts.formula}
           </div>
         ) : (
           <div className="p-4 bg-slate-50 text-xs text-slate-400 italic text-center border-t border-slate-200">
-            * Розрахунки та виміри є орієнтовними. Перевіряйте лекала перед розкроєм.
+            {texts.disclaimer}
           </div>
         )}
       </div>

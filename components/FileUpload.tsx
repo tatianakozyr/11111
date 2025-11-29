@@ -1,18 +1,21 @@
+
 import React, { useCallback, useState } from 'react';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Texts } from '../translations';
 
 interface FileUploadProps {
   onImageSelected: (base64: string) => void;
   isLoading: boolean;
+  texts: Texts;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ onImageSelected, isLoading }) => {
+const FileUpload: React.FC<FileUploadProps> = ({ onImageSelected, isLoading, texts }) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const processFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
-      alert('Будь ласка, завантажте файл зображення.');
+      alert(texts.pleaseUpload);
       return;
     }
 
@@ -35,7 +38,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onImageSelected, isLoading }) =
         processFile(e.dataTransfer.files[0]);
       }
     },
-    [isLoading] // eslint-disable-line react-hooks/exhaustive-deps
+    [isLoading, texts] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +51,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onImageSelected, isLoading }) =
     e.stopPropagation();
     setPreview(null);
     onImageSelected('');
-    // Reset file input value if needed via ref, but simpler to just let user re-click
   };
 
   return (
@@ -94,14 +96,14 @@ const FileUpload: React.FC<FileUploadProps> = ({ onImageSelected, isLoading }) =
                 <Upload size={32} />
               </div>
               <p className="text-lg font-medium text-slate-700">
-                Перетягніть фото куртки сюди
+                {texts.dragDrop}
               </p>
               <p className="text-sm text-slate-500 mt-2">
-                або натисніть для вибору файлу
+                {texts.orClick}
               </p>
               <div className="mt-4 flex items-center gap-2 text-xs text-slate-400">
                 <ImageIcon size={14} />
-                <span>JPEG, PNG, WEBP</span>
+                <span>{texts.formats}</span>
               </div>
             </>
           )}

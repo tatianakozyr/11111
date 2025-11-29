@@ -1,10 +1,14 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
-import { MaterialEstimate } from "../types";
+import { MaterialEstimate, Language } from "../types";
 
 const apiKey = process.env.API_KEY || '';
 const ai = new GoogleGenAI({ apiKey });
 
-const SYSTEM_INSTRUCTION = `
+const getSystemInstruction = (lang: Language) => {
+  const langName = lang === 'uk' ? 'українською' : lang === 'ru' ? 'русском' : 'English';
+  
+  return `
 Ти — експертний технолог швейного виробництва. 
 Твоє завдання — проаналізувати зображення куртки та надати детальну технічну інформацію.
 1. Визнач тип куртки.
@@ -12,20 +16,23 @@ const SYSTEM_INSTRUCTION = `
    - Орієнтовні виміри готового виробу: Довжина по спинці, Напівобхват грудей, Довжина рукава. Базуйся на стандартних розмірних сітках для верхнього одягу.
    - Розрахуй витрати тканини та фурнітури.
 3. СУВОРО дотримуйся вказаної ширини тканини при розрахунках, якщо вона надана користувачем.
-4. Результат має бути українською мовою.
+4. Результат має бути виключно мовою: ${langName}.
 `;
+};
 
 export const analyzeJacketImage = async (
   base64Image: string,
-  mainFabricWidth?: string,
-  liningFabricWidth?: string,
-  insulationWidth?: string
+  mainFabricWidth: string | undefined,
+  liningFabricWidth: string | undefined,
+  insulationWidth: string | undefined,
+  language: Language = 'uk'
 ): Promise<MaterialEstimate[]> => {
   try {
     // Remove data URL prefix if present (e.g., "data:image/jpeg;base64,")
     const cleanBase64 = base64Image.split(',')[1] || base64Image;
 
-    let promptText = "Проаналізуй цю куртку. Склади таблицю параметрів виробу та витрат матеріалів для розмірів M, L, XL, XXL, XXXL.";
+    const langName = language === 'uk' ? 'українською' : language === 'ru' ? 'російською' : 'англійською';
+    let promptText = `Проаналізуй цю куртку. Склади таблицю параметрів виробу та витрат матеріалів для розмірів M, L, XL, XXL, XXXL. Мова відповіді: ${langName}.`;
 
     // Append specific width instructions if provided
     if (mainFabricWidth || liningFabricWidth || insulationWidth) {
@@ -57,7 +64,7 @@ export const analyzeJacketImage = async (
         parts: [
           {
             inlineData: {
-              mimeType: "image/jpeg", // Assuming JPEG for simplicity, API handles most common types
+              mimeType: "image/jpeg",
               data: cleanBase64
             }
           },
@@ -67,7 +74,7 @@ export const analyzeJacketImage = async (
         ]
       },
       config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
+        systemInstruction: getSystemInstruction(language),
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.ARRAY,
@@ -76,39 +83,39 @@ export const analyzeJacketImage = async (
             properties: {
               size: {
                 type: Type.STRING,
-                description: "Розмір (M, L, XL, XXL, XXXL)"
+                description: "Size label (M, L, XL, etc)"
               },
               backLength: {
                 type: Type.STRING,
-                description: "Довжина виробу по спинці (в см), наприклад '72 см'"
+                description: "Back length in cm with unit"
               },
               chestWidth: {
                 type: Type.STRING,
-                description: "Напівобхват грудей (в см), наприклад '54 см'"
+                description: "Chest width (half-girth) in cm with unit"
               },
               sleeveLength: {
                 type: Type.STRING,
-                description: "Довжина рукава від плеча (в см), наприклад '64 см'"
+                description: "Sleeve length from shoulder in cm with unit"
               },
               mainFabric: {
                 type: Type.STRING,
-                description: "Кількість основної тканини (в метрах), наприклад '1.8 м'"
+                description: "Main fabric usage in meters with unit"
               },
               liningFabric: {
                 type: Type.STRING,
-                description: "Кількість підкладкової тканини (в метрах)"
+                description: "Lining fabric usage in meters with unit"
               },
               insulation: {
                 type: Type.STRING,
-                description: "Кількість утеплювача (якщо є), або прочерк"
+                description: "Insulation usage (if any) or dash"
               },
               hardware: {
                 type: Type.STRING,
-                description: "Список фурнітури (блискавки, кнопки, люверси), наприклад 'Блискавка 70см, 6 кнопок'"
+                description: "List of hardware (zippers, buttons, etc) translated to target language"
               },
               notes: {
                 type: Type.STRING,
-                description: "Короткі примітки"
+                description: "Short notes in target language"
               }
             },
             required: ["size", "backLength", "chestWidth", "sleeveLength", "mainFabric", "liningFabric", "hardware"]
@@ -118,7 +125,7 @@ export const analyzeJacketImage = async (
     });
 
     if (!response.text) {
-      throw new Error("Не вдалося отримати відповідь від Gemini.");
+      throw new Error("Gemini returned empty response.");
     }
 
     const data: MaterialEstimate[] = JSON.parse(response.text);

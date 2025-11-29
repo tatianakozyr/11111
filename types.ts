@@ -1,3 +1,4 @@
+
 export interface MaterialEstimate {
   size: string;
   // Product Dimensions
@@ -24,3 +25,5 @@ export enum AppStatus {
   SUCCESS = 'SUCCESS',
   ERROR = 'ERROR'
 }
+
+export type Language = 'uk' | 'en' | 'ru';
