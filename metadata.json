@@ -1,0 +1,5 @@
+{
+  "name": "Jacket Material Estimator",
+  "description": "Аналізатор фото курток для розрахунку витрат тканини та фурнітури на різні розміри (M-XXXL).",
+  "requestFramePermissions": []
+}
