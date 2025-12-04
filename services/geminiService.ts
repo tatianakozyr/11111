@@ -12,7 +12,7 @@ const getSystemInstruction = (lang: Language) => {
 Ти — експертний технолог швейного виробництва. 
 Твоє завдання — проаналізувати зображення куртки та надати детальну технічну інформацію.
 1. Визнач тип куртки.
-2. Для кожного розміру (M, L, XL, XXL, XXXL) визнач:
+2. Для кожного розміру (S, M, L, XL, XXL) визнач:
    - Орієнтовні виміри готового виробу: Довжина по спинці, Напівобхват грудей, Довжина рукава. Базуйся на стандартних розмірних сітках для верхнього одягу.
    - Розрахуй витрати тканини та фурнітури.
 3. СУВОРО дотримуйся вказаної ширини тканини при розрахунках, якщо вона надана користувачем.
@@ -32,7 +32,7 @@ export const analyzeJacketImage = async (
     const cleanBase64 = base64Image.split(',')[1] || base64Image;
 
     const langName = language === 'uk' ? 'українською' : language === 'ru' ? 'російською' : 'англійською';
-    let promptText = `Проаналізуй цю куртку. Склади таблицю параметрів виробу та витрат матеріалів для розмірів M, L, XL, XXL, XXXL. Мова відповіді: ${langName}.`;
+    let promptText = `Проаналізуй цю куртку. Склади таблицю параметрів виробу та витрат матеріалів для розмірів S, M, L, XL, XXL. Мова відповіді: ${langName}.`;
 
     // Append specific width instructions if provided
     if (mainFabricWidth || liningFabricWidth || insulationWidth) {
@@ -83,7 +83,7 @@ export const analyzeJacketImage = async (
             properties: {
               size: {
                 type: Type.STRING,
-                description: "Size label (M, L, XL, etc)"
+                description: "Size label (S, M, L, XL, etc)"
               },
               backLength: {
                 type: Type.STRING,
